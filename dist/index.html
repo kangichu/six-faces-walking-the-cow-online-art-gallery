@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Six Faces / Walking The Cow</title>
+
+    <!-- SEO -->
+    <meta name="description"
+          id="meta-description"
+          content="A scroll-driven 3D cube that rotates through six faces as you move down the page. An experiment in reverse creativity.">
+    <meta name="author" content="Six Faces">
+
+    <!-- Open Graph -->
+    <meta property="og:type"        content="website">
+    <meta property="og:title"       id="og-title"       content="Six Faces / Walking The Cow">
+    <meta property="og:description" id="og-description" content="A scroll-driven 3D cube that rotates through six faces as you move down the page. An experiment in reverse creativity.">
+    <meta property="og:image"       id="og-image"       content="">
+    <meta property="og:url"         id="og-url"         content="">
+
+    <!-- Twitter / X Card -->
+    <meta name="twitter:card"        id="twitter-card"        content="summary_large_image">
+    <meta name="twitter:title"       id="twitter-title"       content="Six Faces / Walking The Cow">
+    <meta name="twitter:description" id="twitter-description" content="A scroll-driven 3D cube that rotates through six faces as you move down the page. An experiment in reverse creativity.">
+    <meta name="twitter:image"       id="twitter-image"       content="">
+
+    <link rel="canonical" id="canonical-url" href="">
+    <link rel="stylesheet" href="./style.css?v=__BUILD_ID__">
+  </head>
+    
+  <body>
+    <div id="scene">
+      <div id="cube">
+        <div class="face" data-face="top" data-i="0"><span class="face-ph">TOP</span></div>
+        <div class="face" data-face="front" data-i="1"><span class="face-ph">FRONT</span></div>
+        <div class="face" data-face="right" data-i="2"><span class="face-ph">RIGHT</span></div>
+        <div class="face" data-face="back" data-i="3"><span class="face-ph">BACK</span></div>
+        <div class="face" data-face="left" data-i="4"><span class="face-ph">LEFT</span></div>
+        <div class="face" data-face="bottom" data-i="5"><span class="face-ph">BOTTOM</span></div>
+      </div>
+    </div>
+
+    <div id="hud">
+      <div id="hud_pct">000%</div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="prog_fill"></div>
+      </div>
+      <div class="scene-label" id="scene_name">DESCENT</div>
+    </div>
+
+    <button id="theme_toggle" aria-label="Toggle light/dark mode">
+      <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
+      </svg>
+      <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M21 12.79A9 9 0 1 1 11.21 3a7 7 0 0 0 9.79 9.79z" />
+      </svg>
+    </button>
+
+    <div id="scene_strip">
+      <!-- rebuilt dynamically by script.js -->
+    </div>
+
+    <div id="face_caption">
+      <div id="face_caption_num">01</div>
+      <div id="face_caption_name">DESCENT</div>
+    </div>
+
+    <div id="scroll_container">
+
+      <section id="s0">
+        <div class="text-card">
+          <div class="tag"></div>
+          <h1></h1>
+          <p class="body-text"></p>
+          <div class="cta-row">
+            <a class="cta" id="s0_enter" href="#s1">
+              Enter
+              <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M1 6h10M6 1l5 5-5 5" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- gallery sections s1-s(N-1) are built dynamically by script.js -->
+
+    </div>
+
+    <div id="credit">
+      <button id="btn-credit" aria-label="About this project">About</button>
+    </div>
+
+    <!-- ── Credit modal ──────────────────────────────────────────────────── -->
+    <div id="credit-overlay" hidden aria-modal="true" role="dialog" aria-labelledby="credit-title">
+      <div id="credit-modal">
+        <button id="btn-credit-close" aria-label="Close">&times;</button>
+        <p class="credit-label">Original concept</p>
+        <h2 id="credit-title">Six Faces /<br>Walking The Cow</h2>
+        <p class="credit-body">
+          This gallery is built on a scroll-driven 3D CSS cube originally
+          created by <strong>Luis Martinez</strong> on CodePen as part of
+          the <em>Reverse Creativity</em> experiment — asking AI to work
+          against itself, break composition rules, and leave the mistakes
+          in place.
+        </p>
+        <p class="credit-body">
+          For Daniel Johnston, who walked the cow first.
+        </p>
+        <div class="credit-links">
+          <a href="https://github.com/kangichu/six-faces-walking-the-cow-online-art-gallery"
+             target="_blank" rel="noopener">View on GitHub →</a>
+          <a href="https://codepen.io/luis-lessrain/pen/ZYpyoRV"
+             target="_blank" rel="noopener">Original CodePen →</a>
+          <a href="https://www.linkedin.com/posts/luis-martinez-lr_ai-creativity-reversecreativity-activity-7366853269517651970-zeUD"
+             target="_blank" rel="noopener">Reverse Creativity post →</a>
+        </div>
+        <a href="/admin/" class="credit-admin-link">Admin panel</a>
+      </div>
+    </div>
+
+    <script src="./script.js?v=__BUILD_ID__"></script>
+  </body>
+  
+</html>
