@@ -350,6 +350,42 @@ function applySiteSettings(s) {
   if (s.twitter_card) {
     setMeta('twitter-card', s.twitter_card);
   }
+
+  // ── Populate credit / about modal ─────────────────────────────────────────
+  const setText = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val) el.textContent = val;
+  };
+
+  if (s.about_label) setText('credit-label', s.about_label);
+
+  if (s.about_title) {
+    const el = document.getElementById('credit-title');
+    if (el) el.innerHTML = escHtml(s.about_title).replace(/\n/g, '<br>');
+  }
+
+  if (s.about_body) {
+    const el = document.getElementById('credit-body');
+    if (el) {
+      // Each blank-line-separated paragraph becomes its own <p>
+      el.innerHTML = s.about_body
+        .split(/\n\n+/)
+        .map((p) => `<span>${escHtml(p.trim())}</span>`)
+        .join('<br><br>');
+    }
+  }
+
+  const setLink = (id, text, url, show) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (text) el.textContent = text;
+    if (url)  el.href        = url;
+    // hide if explicitly disabled or both fields are empty
+    el.hidden = (show === false) || (!url && !text);
+  };
+  setLink('credit-link-1', s.about_link_1_text, s.about_link_1_url, s.about_link_1_show);
+  setLink('credit-link-2', s.about_link_2_text, s.about_link_2_url, s.about_link_2_show);
+  setLink('credit-link-3', s.about_link_3_text, s.about_link_3_url, s.about_link_3_show);
 }
 
 // ── init ──────────────────────────────────────────────────────────────────────

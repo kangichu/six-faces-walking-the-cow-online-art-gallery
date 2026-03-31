@@ -59,6 +59,18 @@ const sDescription     = $('s-description');
 const sOgImage         = $('s-og-image');
 const sCanonical       = $('s-canonical');
 const sTwitterCard     = $('s-twitter-card');
+const sAboutLabel      = $('s-about-label');
+const sAboutTitle      = $('s-about-title');
+const sAboutBody       = $('s-about-body');
+const sLink1Text       = $('s-link-1-text');
+const sLink1Url        = $('s-link-1-url');
+const sLink1Show       = $('s-link-1-show');
+const sLink2Text       = $('s-link-2-text');
+const sLink2Url        = $('s-link-2-url');
+const sLink2Show       = $('s-link-2-show');
+const sLink3Text       = $('s-link-3-text');
+const sLink3Url        = $('s-link-3-url');
+const sLink3Show       = $('s-link-3-show');
 const settingsError    = $('settings-error');
 const settingsSuccess  = $('settings-success');
 
@@ -545,15 +557,49 @@ async function openSettingsModal() {
       sOgImage.value           = data.og_image         || '';
       sCanonical.value         = data.canonical_url    || '';
       sTwitterCard.value       = data.twitter_card     || 'summary_large_image';
+      sAboutLabel.value        = data.about_label       || '';
+      sAboutTitle.value        = data.about_title       || '';
+      sAboutBody.value         = data.about_body        || '';
+      sLink1Text.value         = data.about_link_1_text  || '';
+      sLink1Url.value          = data.about_link_1_url   || '';
+      sLink1Show.checked       = data.about_link_1_show  !== false;
+      sLink2Text.value         = data.about_link_2_text  || '';
+      sLink2Url.value          = data.about_link_2_url   || '';
+      sLink2Show.checked       = data.about_link_2_show  !== false;
+      sLink3Text.value         = data.about_link_3_text  || '';
+      sLink3Url.value          = data.about_link_3_url   || '';
+      sLink3Show.checked       = data.about_link_3_show  !== false;
     }
   } catch { /* leave fields empty */ }
   settingsOverlay.hidden = false;
+  // always open on the first tab
+  document.querySelectorAll('.settings-tab').forEach((t, i) => {
+    t.classList.toggle('is-active', i === 0);
+    t.setAttribute('aria-selected', i === 0 ? 'true' : 'false');
+  });
+  document.querySelectorAll('.settings-tab-panel').forEach((p, i) => { p.hidden = i !== 0; });
   sTitle.focus();
 }
 
 function closeSettingsModal() {
   settingsOverlay.hidden = true;
 }
+
+// ── Settings tab switching ────────────────────────────────────────────────────
+document.querySelectorAll('.settings-tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.settings-tab').forEach((t) => {
+      t.classList.remove('is-active');
+      t.setAttribute('aria-selected', 'false');
+    });
+    document.querySelectorAll('.settings-tab-panel').forEach((p) => {
+      p.hidden = true;
+    });
+    btn.classList.add('is-active');
+    btn.setAttribute('aria-selected', 'true');
+    document.getElementById(btn.getAttribute('aria-controls')).hidden = false;
+  });
+});
 
 btnSiteSettings.addEventListener('click',   openSettingsModal);
 btnCloseSettings.addEventListener('click',  closeSettingsModal);
@@ -565,11 +611,23 @@ btnSaveSettings.addEventListener('click', async () => {
   settingsSuccess.hidden = true;
 
   const payload = {
-    site_title:       sTitle.value.trim(),
-    meta_description: sDescription.value.trim(),
-    og_image:         sOgImage.value.trim(),
-    canonical_url:    sCanonical.value.trim(),
-    twitter_card:     sTwitterCard.value,
+    site_title:         sTitle.value.trim(),
+    meta_description:   sDescription.value.trim(),
+    og_image:           sOgImage.value.trim(),
+    canonical_url:      sCanonical.value.trim(),
+    twitter_card:       sTwitterCard.value,
+    about_label:        sAboutLabel.value.trim(),
+    about_title:        sAboutTitle.value.trim(),
+    about_body:         sAboutBody.value.trim(),
+    about_link_1_text:  sLink1Text.value.trim(),
+    about_link_1_url:   sLink1Url.value.trim(),
+    about_link_1_show:  sLink1Show.checked,
+    about_link_2_text:  sLink2Text.value.trim(),
+    about_link_2_url:   sLink2Url.value.trim(),
+    about_link_2_show:  sLink2Show.checked,
+    about_link_3_text:  sLink3Text.value.trim(),
+    about_link_3_url:   sLink3Url.value.trim(),
+    about_link_3_show:  sLink3Show.checked,
   };
 
   btnSaveSettings.disabled = true;

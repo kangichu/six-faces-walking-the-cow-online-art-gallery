@@ -209,35 +209,114 @@
         <h3 class="modal-title" id="settings-title">Site Settings</h3>
         <button class="modal-close" id="btn-close-settings" aria-label="Close">&times;</button>
       </div>
+
+      <!-- ── Tab bar ── -->
+      <div class="settings-tabs" role="tablist">
+        <button class="settings-tab is-active" role="tab" aria-selected="true"  aria-controls="stab-seo"   id="stab-btn-seo">SEO &amp; Meta</button>
+        <button class="settings-tab"           role="tab" aria-selected="false" aria-controls="stab-about" id="stab-btn-about">About / Credit</button>
+      </div>
+
       <div class="modal-body">
-        <p class="section-hint" style="margin-bottom:1.2rem">These values populate the page title, search engine description, and social sharing cards.</p>
 
-        <div class="field">
-          <label for="s-title">Site Title <small>(max 100 characters)</small></label>
-          <input type="text" id="s-title" maxlength="100" placeholder="Six Faces / Walking The Cow">
+        <!-- ── Tab 1: SEO ── -->
+        <div id="stab-seo" class="settings-tab-panel" role="tabpanel" aria-labelledby="stab-btn-seo">
+          <p class="section-hint">These values populate the page title, search engine description, and social sharing cards.</p>
+
+          <div class="field">
+            <label for="s-title">Site Title <small>(max 100 characters)</small></label>
+            <input type="text" id="s-title" maxlength="100" placeholder="Six Faces / Walking The Cow">
+          </div>
+
+          <div class="field">
+            <label for="s-description">Meta Description <small>(max 500 characters)</small></label>
+            <textarea id="s-description" rows="3" maxlength="500" placeholder="A short description shown in search results and link previews."></textarea>
+          </div>
+
+          <div class="field">
+            <label for="s-og-image">OG / Social Share Image URL</label>
+            <input type="url" id="s-og-image" placeholder="https://example.com/preview.jpg">
+          </div>
+
+          <div class="field">
+            <label for="s-canonical">Canonical URL <small>(your public domain)</small></label>
+            <input type="url" id="s-canonical" placeholder="https://yoursite.com">
+          </div>
+
+          <div class="field">
+            <label for="s-twitter-card">Twitter Card Type</label>
+            <select id="s-twitter-card">
+              <option value="summary_large_image">Large Image (summary_large_image)</option>
+              <option value="summary">Summary</option>
+            </select>
+          </div>
         </div>
 
-        <div class="field">
-          <label for="s-description">Meta Description <small>(max 500 characters)</small></label>
-          <textarea id="s-description" rows="3" maxlength="500" placeholder="A short description shown in search results and link previews."></textarea>
-        </div>
+        <!-- ── Tab 2: About ── -->
+        <div id="stab-about" class="settings-tab-panel" role="tabpanel" aria-labelledby="stab-btn-about" hidden>
+          <p class="section-hint">Content shown in the About / Credit modal on the gallery page.</p>
 
-        <div class="field">
-          <label for="s-og-image">OG / Social Share Image URL</label>
-          <input type="url" id="s-og-image" placeholder="https://example.com/preview.jpg">
-        </div>
+          <div class="field">
+            <label for="s-about-label">Label <small>(small tag above title)</small></label>
+            <input type="text" id="s-about-label" maxlength="80" placeholder="Original concept">
+          </div>
 
-        <div class="field">
-          <label for="s-canonical">Canonical URL <small>(your public domain)</small></label>
-          <input type="url" id="s-canonical" placeholder="https://yoursite.com">
-        </div>
+          <div class="field">
+            <label for="s-about-title">Title <small>(\n = line break in modal)</small></label>
+            <input type="text" id="s-about-title" maxlength="120" placeholder="Six Faces / Walking The Cow">
+          </div>
 
-        <div class="field">
-          <label for="s-twitter-card">Twitter Card Type</label>
-          <select id="s-twitter-card">
-            <option value="summary_large_image">Large Image (summary_large_image)</option>
-            <option value="summary">Summary</option>
-          </select>
+          <div class="field">
+            <label for="s-about-body">Body <small>(blank line = paragraph break)</small></label>
+            <textarea id="s-about-body" rows="4" maxlength="1000"></textarea>
+          </div>
+
+          <div class="field-row field-row--link">
+            <div class="field">
+              <label for="s-link-1-text">Link 1 text</label>
+              <input type="text" id="s-link-1-text" maxlength="80" placeholder="View on GitHub →">
+            </div>
+            <div class="field">
+              <label for="s-link-1-url">Link 1 URL</label>
+              <input type="url" id="s-link-1-url" placeholder="https://…">
+            </div>
+            <div class="field field--checkbox">
+              <label class="checkbox-label" for="s-link-1-show">
+                <input type="checkbox" id="s-link-1-show"> Show
+              </label>
+            </div>
+          </div>
+
+          <div class="field-row field-row--link">
+            <div class="field">
+              <label for="s-link-2-text">Link 2 text</label>
+              <input type="text" id="s-link-2-text" maxlength="80" placeholder="Original CodePen →">
+            </div>
+            <div class="field">
+              <label for="s-link-2-url">Link 2 URL</label>
+              <input type="url" id="s-link-2-url" placeholder="https://…">
+            </div>
+            <div class="field field--checkbox">
+              <label class="checkbox-label" for="s-link-2-show">
+                <input type="checkbox" id="s-link-2-show"> Show
+              </label>
+            </div>
+          </div>
+
+          <div class="field-row field-row--link">
+            <div class="field">
+              <label for="s-link-3-text">Link 3 text</label>
+              <input type="text" id="s-link-3-text" maxlength="80">
+            </div>
+            <div class="field">
+              <label for="s-link-3-url">Link 3 URL</label>
+              <input type="url" id="s-link-3-url" placeholder="https://…">
+            </div>
+            <div class="field field--checkbox">
+              <label class="checkbox-label" for="s-link-3-show">
+                <input type="checkbox" id="s-link-3-show"> Show
+              </label>
+            </div>
+          </div>
         </div>
 
         <div id="settings-error"   class="error-msg"   hidden></div>

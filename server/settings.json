@@ -1,0 +1,19 @@
+{
+  "site_title": "Six Faces / Walking The Cow",
+  "meta_description": "A scroll-driven 3D cube that rotates through six faces as you move down the page.",
+  "og_image": "",
+  "canonical_url": "",
+  "twitter_card": "summary_large_image",
+  "about_label": "Original concept",
+  "about_title": "Six Faces /Walking The Cow",
+  "about_body": "This gallery is built on a scroll-driven 3D CSS cube originally created by Luis Martinez on CodePen as part of the Reverse Creativity experiment — asking AI to work against itself, break composition rules, and leave the mistakes in place.\n\nFor Daniel Johnston, who walked the cow first.",
+  "about_link_1_text": "View on GitHub →",
+  "about_link_1_url": "https://github.com/kangichu/six-faces-walking-the-cow-online-art-gallery",
+  "about_link_1_show": false,
+  "about_link_2_text": "Original CodePen →",
+  "about_link_2_url": "https://codepen.io/luis-lessrain/pen/ZYpyoRV",
+  "about_link_2_show": false,
+  "about_link_3_text": "Reverse Creativity post →",
+  "about_link_3_url": "https://www.linkedin.com/posts/luis-martinez-lr_ai-creativity-reversecreativity-activity-7366853269517651970-zeUD",
+  "about_link_3_show": false
+}

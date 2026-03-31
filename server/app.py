@@ -123,6 +123,19 @@ _DEFAULT_SETTINGS = {
     'og_image':         '',
     'canonical_url':    '',
     'twitter_card':     'summary_large_image',
+    # About / credit modal
+    'about_label':      'Original concept',
+    'about_title':      'Six Faces /\nWalking The Cow',
+    'about_body':       'This gallery is built on a scroll-driven 3D CSS cube originally created by Luis Martinez on CodePen as part of the Reverse Creativity experiment — asking AI to work against itself, break composition rules, and leave the mistakes in place.\n\nFor Daniel Johnston, who walked the cow first.',
+    'about_link_1_text': 'View on GitHub →',
+    'about_link_1_url':  'https://github.com/kangichu/six-faces-walking-the-cow-online-art-gallery',
+    'about_link_1_show': True,
+    'about_link_2_text': 'Original CodePen →',
+    'about_link_2_url':  'https://codepen.io/luis-lessrain/pen/ZYpyoRV',
+    'about_link_2_show': True,
+    'about_link_3_text': 'Reverse Creativity post →',
+    'about_link_3_url':  'https://www.linkedin.com/posts/luis-martinez-lr_ai-creativity-reversecreativity-activity-7366853269517651970-zeUD',
+    'about_link_3_show': True,
 }
 
 def load_settings():
@@ -404,6 +417,38 @@ def update_settings():
         val = str(body['twitter_card']).strip()
         if val in ('summary', 'summary_large_image'):
             settings['twitter_card'] = val
+
+    # About / credit modal fields
+    if 'about_label' in body:
+        val = str(body['about_label']).strip()
+        if len(val) <= 80:
+            settings['about_label'] = val
+
+    if 'about_title' in body:
+        val = str(body['about_title']).strip()
+        if len(val) <= 120:
+            settings['about_title'] = val
+
+    if 'about_body' in body:
+        val = str(body['about_body']).strip()
+        if len(val) <= 1000:
+            settings['about_body'] = val
+
+    for key in ('about_link_1_text', 'about_link_2_text', 'about_link_3_text'):
+        if key in body:
+            val = str(body[key]).strip()
+            if len(val) <= 80:
+                settings[key] = val
+
+    for key in ('about_link_1_url', 'about_link_2_url', 'about_link_3_url'):
+        if key in body:
+            val = str(body[key]).strip()
+            if not val or val.startswith(('http://', 'https://')):
+                settings[key] = val
+
+    for key in ('about_link_1_show', 'about_link_2_show', 'about_link_3_show'):
+        if key in body:
+            settings[key] = bool(body[key])
 
     save_settings(settings)
     return jsonify(settings), 200
