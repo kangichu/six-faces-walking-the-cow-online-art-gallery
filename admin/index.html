@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Six Faces — Admin</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+  <!-- ── Login ────────────────────────────────────────────────────────────── -->
+  <div id="login-screen" class="screen">
+    <div class="login-card">
+      <div class="login-logo">SIX FACES</div>
+      <div class="login-tag">Admin Panel</div>
+      <form id="login-form" autocomplete="on" novalidate>
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" autocomplete="current-password" required>
+        </div>
+        <div id="login-error" class="error-msg" hidden></div>
+        <button type="submit" class="btn-primary" id="btn-login">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── Dashboard ────────────────────────────────────────────────────────── -->
+  <div id="dashboard" class="screen" hidden>
+
+    <header class="admin-header">
+      <div class="header-left">
+        <span class="header-logo">SIX FACES</span>
+        <span class="header-tag">Admin</span>
+      </div>
+      <div class="header-right">
+        <span id="entry-count">0 / 6</span>
+        <a href="/" class="btn-outline" target="_blank" rel="noopener">View Gallery</a>
+        <button class="btn-outline" id="btn-change-pw">Change Password</button>
+        <button class="btn-outline" id="btn-logout">Sign Out</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <div class="section-header">
+        <h2 class="section-title">Cube Entries</h2>
+        <button class="btn-primary" id="btn-add">+ Add Entry</button>
+      </div>
+
+      <!-- Main Faces group -->
+      <div class="entry-group">
+        <div class="entry-group-header">
+          <h3 class="entry-group-title">Main Faces</h3>
+          <span class="entry-group-count" id="main-count">0 / 6</span>
+        </div>
+        <p class="section-hint">Always shown in this fixed order every visit. Use ↑ ↓ to reorder. Max 6.</p>
+        <div class="entry-grid" id="main-grid"></div>
+        <p class="empty-state" id="main-empty" hidden>No main entries yet. Add one with the button above.</p>
+      </div>
+
+      <!-- Random Pool group -->
+      <div class="entry-group">
+        <div class="entry-group-header">
+          <h3 class="entry-group-title">Random Pool</h3>
+          <span class="entry-group-count" id="pool-count">0</span>
+        </div>
+        <p class="section-hint">Randomly fills any remaining cube face slots on each page load.</p>
+        <div class="entry-grid" id="pool-grid"></div>
+        <p class="empty-state" id="pool-empty" hidden>No pool entries yet.</p>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- ── Edit / Create Modal ──────────────────────────────────────────────── -->
+  <div id="modal-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal">
+
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-title">Add Entry</h3>
+        <button class="modal-close" id="btn-close-modal" aria-label="Close">&times;</button>
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Entry type -->
+        <div class="field type-field">
+          <label>Entry Type</label>
+          <div class="radio-group">
+            <label class="radio-opt">
+              <input type="radio" name="f-type" id="f-type-main" value="main" checked>
+              <span class="radio-label">
+                <strong>Main Face</strong>
+                <small>Always shown in fixed order (max 6)</small>
+              </span>
+            </label>
+            <label class="radio-opt">
+              <input type="radio" name="f-type" id="f-type-random" value="random">
+              <span class="radio-label">
+                <strong>Random Pool</strong>
+                <small>Randomly fills empty cube faces each visit</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Image dropzone -->
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload image">
+          <img id="image-preview" alt="Preview" hidden>
+          <div class="dropzone-placeholder" id="dropzone-placeholder">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+              <rect x="3" y="3" width="18" height="18" rx="1"/>
+              <path d="M3 16l5-5 4 4 3-3 6 6"/>
+              <circle cx="8.5" cy="8.5" r="1.5"/>
+            </svg>
+            <span>Click or drag image here</span>
+            <small>WEBP · JPG · PNG · GIF &bull; Max 10 MB</small>
+          </div>
+          <input type="file" id="image-input" accept=".jpg,.jpeg,.png,.webp,.gif" tabindex="-1" hidden>
+        </div>
+
+        <!-- URL alternative -->
+        <div class="img-or">
+          <span class="img-or-line"></span>
+          <span class="img-or-label">or paste a URL</span>
+          <span class="img-or-line"></span>
+        </div>
+        <div class="field">
+          <label for="f-image-url">Image URL</label>
+          <input type="url" id="f-image-url" placeholder="https://example.com/image.jpg">
+        </div>
+
+        <!-- Text fields -->
+        <div class="form-fields">
+          <div class="field-row">
+            <div class="field">
+              <label for="f-face-name">Face Name <small>(shown in HUD)</small></label>
+              <input type="text" id="f-face-name" placeholder="DESCENT" maxlength="30">
+            </div>
+            <div class="field">
+              <label for="f-align">Card Alignment</label>
+              <select id="f-align">
+                <option value="left">Left</option>
+                <option value="right">Right</option>
+                <option value="center">Center</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-tag">Tag Line</label>
+            <input type="text" id="f-tag" placeholder="01 — Art Rebellion" maxlength="80">
+          </div>
+
+          <div class="field">
+            <label for="f-heading">Heading <small>(one word / phrase per line = line break)</small></label>
+            <textarea id="f-heading" rows="3" placeholder="FLIP&#10;THE&#10;PROMPT"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="f-body">Body Text</label>
+            <textarea id="f-body" rows="5" placeholder="Describe this face of the cube..."></textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <div id="modal-error" class="error-msg" hidden></div>
+        <div class="modal-actions">
+          <button class="btn-outline" id="btn-cancel">Cancel</button>
+          <button class="btn-primary" id="btn-save">Save Entry</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Delete Confirmation ───────────────────────────────────────────────── -->
+  <div id="confirm-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="confirm-title">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" id="confirm-title">Delete Entry</h3>
+      </div>
+      <div class="modal-body">
+        <p class="confirm-msg">
+          Permanently delete <strong id="confirm-entry-name"></strong> and its
+          image? This cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button class="btn-outline" id="btn-confirm-cancel">Cancel</button>
+          <button class="btn-danger"  id="btn-confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Change Password Modal ──────────────────────────────────────────────── -->
+  <div id="pw-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="pw-title">
+    <div class="modal modal-sm">
+      <div class="modal-header">
+        <h3 class="modal-title" id="pw-title">Change Password</h3>
+        <button class="modal-close" id="btn-close-pw" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="field">
+          <label for="pw-current">Current Password</label>
+          <input type="password" id="pw-current" autocomplete="current-password">
+        </div>
+        <div class="field">
+          <label for="pw-new">New Password <small>(min 10 characters)</small></label>
+          <input type="password" id="pw-new" autocomplete="new-password">
+        </div>
+        <div class="field">
+          <label for="pw-confirm">Confirm New Password</label>
+          <input type="password" id="pw-confirm" autocomplete="new-password">
+        </div>
+        <div id="pw-error" class="error-msg" hidden></div>
+        <div id="pw-success" class="success-msg" hidden>Password changed successfully.</div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button class="btn-outline" id="btn-cancel-pw">Cancel</button>
+          <button class="btn-primary" id="btn-save-pw">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>

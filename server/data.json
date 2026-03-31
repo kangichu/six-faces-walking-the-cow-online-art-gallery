@@ -1,0 +1,74 @@
+[
+  {
+    "id": "face000000000000000000000000001",
+    "order": 0,
+    "face_name": "DESCENT",
+    "tag": "Cube Gallery — Bad Art",
+    "heading": "WORK\nAGAINST\nTHE MODEL",
+    "body": "What happens when you ask AI to do the opposite of what it was built for? Break proportion. Flip symmetry. Leave the mistakes in place. Scroll to find out.",
+    "align": "left",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-01.webp",
+    "type": "main"
+  },
+  {
+    "id": "face000000000000000000000000002",
+    "order": 1,
+    "face_name": "REBELLION",
+    "tag": "01 — Art Rebellion",
+    "heading": "FLIP\nTHE\nPROMPT",
+    "body": "A cow walking a monster instead of a monster walking a cow. That inversion is enough to break template thinking. The cape ends up on the wrong body.",
+    "align": "right",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-02.webp",
+    "type": "main"
+  },
+  {
+    "id": "face000000000000000000000000003",
+    "order": 2,
+    "face_name": "MOO WALK",
+    "tag": "02 — Moo Walk",
+    "heading": "NEITHER\nLEADS",
+    "body": "Clashing colors. No balance. A dance with no choreography. When the model works against itself something more genuine surfaces.",
+    "align": "left",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-03.webp",
+    "type": "main"
+  },
+  {
+    "id": "face000000000000000000000000004",
+    "order": 3,
+    "face_name": "BAD ART",
+    "tag": "03 — Bad Art",
+    "heading": "REVERSE\nCREATIVITY",
+    "body": "AI is trained to polish and regularize. The harder direction is unlearning that. A television for a head is not an error. It is the point.",
+    "align": "right",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-04.webp",
+    "type": "main"
+  },
+  {
+    "id": "face000000000000000000000000005",
+    "order": 4,
+    "face_name": "NO RULES",
+    "tag": "04 — No Rules",
+    "heading": "NONSENSE\nAT THE\nCENTER",
+    "body": "Dada and the surrealists knew this. Put the absurd at the center and the edges stop pretending. Nine heads in the branches. The sun has a face and it approves.",
+    "align": "left",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-05.webp",
+    "type": "main"
+  },
+  {
+    "id": "face000000000000000000000000006",
+    "order": 5,
+    "face_name": "SUPER",
+    "tag": "05 — Super Monsters",
+    "heading": "RAW\nNOT\nPOLISHED",
+    "body": "Forward creativity takes a sketch and makes it real. This goes the other way. Imperfection left in place is closer to something honest.",
+    "align": "right",
+    "image_filename": null,
+    "image_url": "https://assets.codepen.io/573855/demo-monsters-06.webp",
+    "type": "main"
+  }
+]
