@@ -71,7 +71,13 @@ All values are fetched from `GET /api/settings` at page load alongside the galle
 
 ## First-time setup
 
-On first run `server/.jwt_secret` is generated automatically and a default `admin / admin123` account is created. **Change the password immediately** via the admin panel.
+On first run `server/.jwt_secret` is generated automatically and a default account is created:
+
+| Username | Password  |
+|----------|-----------|
+| `admin`  | `admin123` |
+
+**Change the password immediately** via the admin panel (header → Change Password).
 
 To set a password manually, generate a bcrypt hash and write it to `server/users.json`:
 

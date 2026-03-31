@@ -1,10 +1,13 @@
 import os
 import json
 import uuid
+import time
 import random as _rand
 import secrets
 import bcrypt
 from datetime import datetime, timedelta, timezone
+
+BUILD_ID = str(int(time.time()))
 from flask import Flask, request, jsonify, send_from_directory, redirect
 from flask_cors import CORS
 from flask_jwt_extended import (
@@ -425,6 +428,12 @@ def serve_admin(path):
 @app.route('/', defaults={'path': 'index.html'})
 @app.route('/<path:path>')
 def serve_dist(path):
+    if path == 'index.html':
+        filepath = os.path.join(DIST_DIR, 'index.html')
+        with open(filepath, 'r', encoding='utf-8') as f:
+            content = f.read()
+        content = content.replace('__BUILD_ID__', BUILD_ID)
+        return content, 200, {'Content-Type': 'text/html; charset=utf-8'}
     return send_from_directory(DIST_DIR, path)
 
 # ── entry point ───────────────────────────────────────────────────────────────
