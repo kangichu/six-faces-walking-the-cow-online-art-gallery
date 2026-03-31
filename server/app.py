@@ -14,12 +14,13 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 # ── paths ─────────────────────────────────────────────────────────────────────
-BASE_DIR   = os.path.dirname(os.path.abspath(__file__))
-DIST_DIR   = os.path.abspath(os.path.join(BASE_DIR, '..', 'dist'))
-ADMIN_DIR  = os.path.abspath(os.path.join(BASE_DIR, '..', 'admin'))
-UPLOAD_DIR = os.path.join(BASE_DIR, 'uploads')
-DATA_FILE  = os.path.join(BASE_DIR, 'data.json')
-USERS_FILE = os.path.join(BASE_DIR, 'users.json')
+BASE_DIR      = os.path.dirname(os.path.abspath(__file__))
+DIST_DIR      = os.path.abspath(os.path.join(BASE_DIR, '..', 'dist'))
+ADMIN_DIR     = os.path.abspath(os.path.join(BASE_DIR, '..', 'admin'))
+UPLOAD_DIR    = os.path.join(BASE_DIR, 'uploads')
+DATA_FILE     = os.path.join(BASE_DIR, 'data.json')
+USERS_FILE    = os.path.join(BASE_DIR, 'users.json')
+SETTINGS_FILE = os.path.join(BASE_DIR, 'settings.json')
 
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
@@ -112,6 +113,26 @@ def save_upload(file):
     filename = f'{uuid.uuid4().hex}.{ext}'
     file.save(os.path.join(UPLOAD_DIR, filename))
     return filename
+
+_DEFAULT_SETTINGS = {
+    'site_title':       'Six Faces / Walking The Cow',
+    'meta_description': 'A scroll-driven 3D cube that rotates through six faces as you move down the page.',
+    'og_image':         '',
+    'canonical_url':    '',
+    'twitter_card':     'summary_large_image',
+}
+
+def load_settings():
+    if not os.path.exists(SETTINGS_FILE):
+        return dict(_DEFAULT_SETTINGS)
+    with open(SETTINGS_FILE, 'r', encoding='utf-8') as f:
+        stored = json.load(f)
+    # Merge with defaults so new keys are always present
+    return {**_DEFAULT_SETTINGS, **stored}
+
+def save_settings(settings):
+    with open(SETTINGS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(settings, f, indent=2, ensure_ascii=False)
 
 # ── auth ──────────────────────────────────────────────────────────────────────
 @app.route('/api/auth/login', methods=['POST'])
@@ -344,6 +365,45 @@ def delete_entry(entry_id):
         e['order'] = i
     save_data(data)
     return jsonify({'ok': True}), 200
+
+# ── site settings ────────────────────────────────────────────────────────────
+@app.route('/api/settings', methods=['GET'])
+def get_settings():
+    return jsonify(load_settings()), 200
+
+@app.route('/api/settings', methods=['PUT'])
+@jwt_required()
+def update_settings():
+    body = request.get_json(silent=True) or {}
+    settings = load_settings()
+
+    if 'site_title' in body:
+        val = str(body['site_title']).strip()
+        if len(val) <= 100:
+            settings['site_title'] = val
+
+    if 'meta_description' in body:
+        val = str(body['meta_description']).strip()
+        if len(val) <= 500:
+            settings['meta_description'] = val
+
+    if 'og_image' in body:
+        val = str(body['og_image']).strip()
+        if not val or val.startswith(('http://', 'https://')):
+            settings['og_image'] = val
+
+    if 'canonical_url' in body:
+        val = str(body['canonical_url']).strip()
+        if not val or val.startswith(('http://', 'https://')):
+            settings['canonical_url'] = val
+
+    if 'twitter_card' in body:
+        val = str(body['twitter_card']).strip()
+        if val in ('summary', 'summary_large_image'):
+            settings['twitter_card'] = val
+
+    save_settings(settings)
+    return jsonify(settings), 200
 
 # ── uploads ───────────────────────────────────────────────────────────────────
 @app.route('/uploads/<path:filename>')

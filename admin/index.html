@@ -39,6 +39,7 @@
       <div class="header-right">
         <span id="entry-count">0 / 6</span>
         <a href="/" class="btn-outline" target="_blank" rel="noopener">View Gallery</a>
+        <button class="btn-outline" id="btn-site-settings">Site Settings</button>
         <button class="btn-outline" id="btn-change-pw">Change Password</button>
         <button class="btn-outline" id="btn-logout">Sign Out</button>
       </div>
@@ -196,6 +197,56 @@
         <div class="modal-actions">
           <button class="btn-outline" id="btn-confirm-cancel">Cancel</button>
           <button class="btn-danger"  id="btn-confirm-delete">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Site Settings Modal ─────────────────────────────────────────────────── -->
+  <div id="settings-overlay" class="modal-overlay" hidden role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title" id="settings-title">Site Settings</h3>
+        <button class="modal-close" id="btn-close-settings" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="section-hint" style="margin-bottom:1.2rem">These values populate the page title, search engine description, and social sharing cards.</p>
+
+        <div class="field">
+          <label for="s-title">Site Title <small>(max 100 characters)</small></label>
+          <input type="text" id="s-title" maxlength="100" placeholder="Six Faces / Walking The Cow">
+        </div>
+
+        <div class="field">
+          <label for="s-description">Meta Description <small>(max 500 characters)</small></label>
+          <textarea id="s-description" rows="3" maxlength="500" placeholder="A short description shown in search results and link previews."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="s-og-image">OG / Social Share Image URL</label>
+          <input type="url" id="s-og-image" placeholder="https://example.com/preview.jpg">
+        </div>
+
+        <div class="field">
+          <label for="s-canonical">Canonical URL <small>(your public domain)</small></label>
+          <input type="url" id="s-canonical" placeholder="https://yoursite.com">
+        </div>
+
+        <div class="field">
+          <label for="s-twitter-card">Twitter Card Type</label>
+          <select id="s-twitter-card">
+            <option value="summary_large_image">Large Image (summary_large_image)</option>
+            <option value="summary">Summary</option>
+          </select>
+        </div>
+
+        <div id="settings-error"   class="error-msg"   hidden></div>
+        <div id="settings-success" class="success-msg" hidden>Settings saved.</div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button class="btn-outline" id="btn-cancel-settings">Cancel</button>
+          <button class="btn-primary" id="btn-save-settings">Save Settings</button>
         </div>
       </div>
     </div>

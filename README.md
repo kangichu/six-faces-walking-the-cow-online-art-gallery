@@ -17,13 +17,14 @@ For Daniel Johnston, who walked the cow first.
 ## Structure
 
 ```
-├── dist/          # Gallery frontend (index.html + assets)
-├── admin/         # Admin panel (index.html, script.js, style.css)
-└── server/        # Flask backend
+├── dist/              # Gallery frontend (index.html, script.js, style.css)
+├── admin/             # Admin panel (index.html, script.js, style.css)
+└── server/            # Flask backend
     ├── app.py
-    ├── data.json  # Gallery entries
-    ├── uploads/   # Uploaded images (gitignored)
-    └── users.json # Admin credentials (gitignored)
+    ├── data.json      # Gallery entries
+    ├── settings.json  # Site settings — title, meta, OG (gitignored)
+    ├── uploads/       # Uploaded images (gitignored)
+    └── users.json     # Admin credentials (gitignored)
 ```
 
 ## Running locally
@@ -42,8 +43,23 @@ The gallery is served at `http://localhost:5000` and the admin panel at `http://
 
 - Log in at `/admin` with your credentials
 - Manage up to 6 **main** faces (always shown) and an unlimited **random pool**
-- Upload images or link external URLs
-- Change your password from the header
+- Upload images or link external URLs per entry
+- **Site Settings** — edit the page title, meta description, Open Graph image, canonical URL, and Twitter card type; changes apply on the next gallery page load
+- **Change Password** — update your admin password without touching the server
+
+## SEO & meta tags
+
+The gallery `<head>` includes a full set of tags populated dynamically from the settings stored on the server:
+
+| Tag | Purpose |
+|-----|---------|
+| `<title>` | Browser tab / search result title |
+| `meta description` | Search engine snippet |
+| `og:title`, `og:description`, `og:image`, `og:url` | Facebook / LinkedIn previews |
+| `twitter:card`, `twitter:title`, `twitter:description`, `twitter:image` | Twitter / X cards |
+| `<link rel="canonical">` | Canonical URL for SEO deduplication |
+
+All values are fetched from `GET /api/settings` at page load alongside the gallery entries.
 
 ## Security
 
@@ -51,25 +67,20 @@ The gallery is served at `http://localhost:5000` and the admin panel at `http://
 - Rate limiting on login: 10 requests/minute, 30 requests/hour per IP
 - Account lockout after 5 consecutive failures (15-minute cooldown)
 - Timing-safe login to prevent username enumeration
-- bcrypt password hashing
+- bcrypt password hashing; password change enforces a 10-character minimum
 
 ## First-time setup
 
-On first run, `server/.jwt_secret` is generated automatically. To set your admin password, edit `server/users.json`:
+On first run `server/.jwt_secret` is generated automatically and a default `admin / admin123` account is created. **Change the password immediately** via the admin panel.
 
-```json
-[
-  {
-    "username": "admin",
-    "password_hash": "<bcrypt hash>"
-  }
-]
-```
-
-Generate a hash:
+To set a password manually, generate a bcrypt hash and write it to `server/users.json`:
 
 ```bash
 python -c "import bcrypt; print(bcrypt.hashpw(b'yourpassword', bcrypt.gensalt()).decode())"
+```
+
+```json
+[{ "username": "admin", "password_hash": "<hash from above>" }]
 ```
 
 ## License

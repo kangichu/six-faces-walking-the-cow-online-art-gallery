@@ -49,6 +49,19 @@ const confirmEntryName = $('confirm-entry-name');
 const btnConfirmCancel = $('btn-confirm-cancel');
 const btnConfirmDelete = $('btn-confirm-delete');
 
+const settingsOverlay  = $('settings-overlay');
+const btnSiteSettings  = $('btn-site-settings');
+const btnCloseSettings = $('btn-close-settings');
+const btnCancelSettings= $('btn-cancel-settings');
+const btnSaveSettings  = $('btn-save-settings');
+const sTitle           = $('s-title');
+const sDescription     = $('s-description');
+const sOgImage         = $('s-og-image');
+const sCanonical       = $('s-canonical');
+const sTwitterCard     = $('s-twitter-card');
+const settingsError    = $('settings-error');
+const settingsSuccess  = $('settings-success');
+
 // ── constants ─────────────────────────────────────────────────────────────────
 const MAX_MAIN = 6;
 
@@ -513,9 +526,73 @@ btnConfirmDelete.addEventListener('click', async () => {
 // ── keyboard: close modals with Escape ───────────────────────────────────────
 document.addEventListener('keydown', (e) => {
   if (e.key !== 'Escape') return;
-  if (!modalOverlay.hidden)   closeModal();
-  if (!confirmOverlay.hidden) { confirmOverlay.hidden = true; pendingDeleteId = null; }
-  if (!pwOverlay.hidden)      closePwModal();
+  if (!modalOverlay.hidden)    closeModal();
+  if (!confirmOverlay.hidden)  { confirmOverlay.hidden  = true; pendingDeleteId = null; }
+  if (!pwOverlay.hidden)       closePwModal();
+  if (!settingsOverlay.hidden) closeSettingsModal();
+});
+
+// ── site settings ───────────────────────────────────────────────────────────────────
+async function openSettingsModal() {
+  settingsError.hidden   = true;
+  settingsSuccess.hidden = true;
+  try {
+    const res = await fetch('/api/settings');
+    if (res.ok) {
+      const data = await res.json();
+      sTitle.value             = data.site_title       || '';
+      sDescription.value       = data.meta_description || '';
+      sOgImage.value           = data.og_image         || '';
+      sCanonical.value         = data.canonical_url    || '';
+      sTwitterCard.value       = data.twitter_card     || 'summary_large_image';
+    }
+  } catch { /* leave fields empty */ }
+  settingsOverlay.hidden = false;
+  sTitle.focus();
+}
+
+function closeSettingsModal() {
+  settingsOverlay.hidden = true;
+}
+
+btnSiteSettings.addEventListener('click',   openSettingsModal);
+btnCloseSettings.addEventListener('click',  closeSettingsModal);
+btnCancelSettings.addEventListener('click', closeSettingsModal);
+settingsOverlay.addEventListener('click', (e) => { if (e.target === settingsOverlay) closeSettingsModal(); });
+
+btnSaveSettings.addEventListener('click', async () => {
+  settingsError.hidden   = true;
+  settingsSuccess.hidden = true;
+
+  const payload = {
+    site_title:       sTitle.value.trim(),
+    meta_description: sDescription.value.trim(),
+    og_image:         sOgImage.value.trim(),
+    canonical_url:    sCanonical.value.trim(),
+    twitter_card:     sTwitterCard.value,
+  };
+
+  btnSaveSettings.disabled = true;
+  try {
+    const res = await apiFetch('/api/settings', {
+      method:  'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(payload),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      settingsError.textContent = data.error || 'Failed to save settings.';
+      settingsError.hidden = false;
+      return;
+    }
+    settingsSuccess.hidden = false;
+    setTimeout(closeSettingsModal, 1500);
+  } catch (e) {
+    settingsError.textContent = 'Network error.';
+    settingsError.hidden = false;
+  } finally {
+    btnSaveSettings.disabled = false;
+  }
 });
 
 // ── change password ───────────────────────────────────────────────────────────
