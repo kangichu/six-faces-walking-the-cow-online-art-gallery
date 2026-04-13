@@ -67,6 +67,10 @@ html, body {
     overflow-x: hidden;
     transition: background 0.3s ease, color 0.3s ease;
   }
+
+  html.pane-open {
+    overflow: hidden;
+  }
 }
 
 @layer layout {
@@ -588,6 +592,26 @@ html, body {
     }
   }
 
+  .read-more-btn {
+    display: inline-block;
+    margin-block-start: 1.25rem;
+    padding: 0;
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+    text-decoration: underline;
+    text-underline-offset: 1.25em;
+
+    &:hover { opacity: 1; }
+  }
+
   .cta-back {
     display: inline-flex;
     align-items: center;
@@ -769,4 +793,173 @@ html, body {
       margin-block-start: 1.25rem;
     }
   }
+}
+
+/* ── face pane ───────────────────────────────────────────────────────────────*/
+#face-pane {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: clamp(17rem, 37vw, 31rem);
+  z-index: calc(var(--z-ui) + 5);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  border-right: var(--hairline) solid var(--card-border);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateX(-110%);
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+#face-pane[data-side="right"] {
+  left: auto;
+  right: 0;
+  border-right: none;
+  border-left: var(--hairline) solid var(--card-border);
+  transform: translateX(110%);
+}
+
+#face-pane.open {
+  transform: translateX(0);
+}
+
+#face-pane-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+  z-index: 1;
+  padding: 0.15rem 0.4rem;
+  transition: color 0.2s;
+}
+#face-pane-close:hover { color: var(--fg); }
+
+.face-pane-inner {
+  flex: 1;
+  overflow-y: auto;
+  padding: 3rem 2rem 2.5rem;
+  scrollbar-width: none;
+}
+.face-pane-inner::-webkit-scrollbar { display: none; }
+
+.face-pane-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-block-end: 0.6rem;
+}
+
+.face-pane-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  line-height: 0.92;
+  margin-block-end: 1.5rem;
+}
+
+.face-pane-images {
+  position: relative;
+  margin-block-end: 0.75rem;
+  overflow: hidden;
+}
+.face-pane-images:empty { display: none; }
+
+.pane-img-track {
+  display: flex;
+  transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+
+.pane-img-track img {
+  flex: 0 0 100%;
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  max-height: 18rem;
+}
+
+.pane-img-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-block-start: 0.6rem;
+  margin-block-end: 1.5rem;
+}
+
+.pane-img-dots {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.pane-img-dot {
+  width: 0.25rem;
+  height: 0.25rem;
+  border-radius: 50%;
+  background: var(--muted);
+  opacity: 0.4;
+  transition: opacity 0.2s, background 0.2s;
+}
+
+.pane-img-dot.active {
+  background: var(--accent);
+  opacity: 1;
+}
+
+.pane-img-arrows {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.pane-img-arrow {
+  background: none;
+  border: var(--hairline) solid color-mix(in srgb, var(--muted) 40%, transparent);
+  color: var(--muted);
+  font-size: 0.7rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: var(--accent); color: var(--accent); }
+  &:disabled { opacity: 0.25; cursor: default; }
+}
+
+.face-pane-body {
+  font-size: 0.78rem;
+  line-height: 1.85;
+  color: color-mix(in srgb, var(--fg) 60%, transparent);
+}
+.face-pane-body p + p { margin-block-start: 1rem; }
+.face-pane-body:empty { display: none; }
+
+/* ── pane backdrop ───────────────────────────────────────────────────────────*/
+#pane-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-ui) + 4);
+  display: none;
+  cursor: default;
+}
+#pane-backdrop.visible { display: block; }
+
+/* When pane is open, highlight the About/Info button */
+#btn-credit[data-mode="pane"] {
+  color: var(--accent);
+  opacity: 1;
 }

@@ -331,12 +331,44 @@ function openModal(entry = null) {
   }
   imageInput.value = '';
 
+  // Pane fields
+  $('f-pane-title').value = entry?.pane_title || '';
+  if (paneEditor) paneEditor.root.innerHTML = entry?.pane_body || '';
+  const paneSide = entry?.pane_side || 'left';
+  $('f-pane-left').checked  = paneSide === 'left';
+  $('f-pane-right').checked = paneSide !== 'left';
+
+  // Reset to the Entry tab whenever the modal opens
+  document.querySelectorAll('.modal-tab').forEach((b) => {
+    const on = b.dataset.tab === 'entry';
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  document.querySelectorAll('#tab-entry, #tab-panel').forEach((p) => {
+    p.classList.toggle('active', p.id === 'tab-entry');
+  });
+
+  // Pane images — only manageable when editing a saved entry
+  const paneImgActions = $('pane-img-actions');
+  const paneImgNewHint = $('pane-img-new-hint');
+  if (editingId) {
+    renderPaneRepeater(entry?.pane_images || []);
+    paneImgActions.hidden = false;
+    paneImgNewHint.hidden = true;
+  } else {
+    $('pane-img-repeater').innerHTML = '';
+    paneImgActions.hidden = true;
+    paneImgNewHint.hidden = false;
+  }
+
   modalOverlay.hidden = false;
+  document.body.style.overflow = 'hidden';
   fFaceName.focus();
 }
 
 function closeModal() {
   modalOverlay.hidden = true;
+  document.body.style.overflow = '';
   editingId           = null;
   selectedFile        = null;
   selectedUrl         = null;
@@ -427,12 +459,17 @@ async function saveEntry() {
     if (editingId) {
       // ── update text fields + optional image_url ──
       const putBody = {
-        face_name: fFaceName.value.trim(),
-        tag:       fTag.value.trim(),
-        heading:   fHeading.value.trim(),
-        body:      fBody.value.trim(),
-        align:     fAlign.value,
-        type:      fTypeMain.checked ? 'main' : 'random',
+        face_name:  fFaceName.value.trim(),
+        tag:        fTag.value.trim(),
+        heading:    fHeading.value.trim(),
+        body:       fBody.value.trim(),
+        align:      fAlign.value,
+        type:       fTypeMain.checked ? 'main' : 'random',
+        pane_side:  $('f-pane-left').checked ? 'left' : 'right',
+        pane_title: $('f-pane-title').value.trim(),
+        pane_body: paneEditor
+          ? (paneEditor.root.innerHTML === '<p><br></p>' ? '' : paneEditor.root.innerHTML)
+          : '',
       };
       // Include image_url if user typed one (and no file selected)
       if (selectedUrl && !selectedFile) {
@@ -735,6 +772,198 @@ btnSavePw.addEventListener('click', async () => {
   }
 });
 
+// ── pane images ───────────────────────────────────────────────────────────────
+function renderPaneImages(images) {
+  const list = $('pane-img-list');
+  list.innerHTML = '';
+  if (!images || images.length === 0) {
+    const li = document.createElement('li');
+    li.className   = 'pane-img-empty';
+    li.textContent = 'No images yet.';
+    list.appendChild(li);
+    return;
+  }
+  images.forEach((img) => {
+    const src = img.type === 'upload'
+      ? `/uploads/${img.filename}`
+      : (img.src || '');
+    const li = document.createElement('li');
+    li.className = 'pane-img-item';
+    li.innerHTML = `
+      <img src="${escHtml(src)}" alt="" loading="lazy">
+      <button class="pane-img-remove" aria-label="Remove image">&times;</button>`;
+    li.querySelector('.pane-img-remove').addEventListener('click', () => removePaneImage(img.id));
+    list.appendChild(li);
+  });
+}
+
+// ── pane images repeater ──────────────────────────────────────────────────────────
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+
+function makeSavedRow(img) {
+  const src   = img.type === 'upload' ? `/uploads/${img.filename}` : (img.src || '');
+  const label = img.filename || img.src || src;
+  const row   = document.createElement('div');
+  row.className = 'pane-row pane-row--saved';
+  row.innerHTML = `
+    <div class="pane-row-fields">
+      <img class="pane-row-thumb" src="${escHtml(src)}" alt="" loading="lazy">
+      <span class="pane-row-label" title="${escHtml(label)}">${escHtml(label)}</span>
+      <button type="button" class="pane-row-remove" aria-label="Remove image">&times;</button>
+    </div>`;
+  row.querySelector('.pane-row-remove').addEventListener('click', async () => {
+    row.classList.add('pane-row--removing');
+    try {
+      const res = await apiFetch(`/api/entries/${editingId}/pane-images/${img.id}`, { method: 'DELETE' });
+      if (res.ok) { row.remove(); syncAddBtn(); }
+      else row.classList.remove('pane-row--removing');
+    } catch { row.classList.remove('pane-row--removing'); }
+  });
+  return row;
+}
+
+function makeInputRow() {
+  const row = document.createElement('div');
+  row.className = 'pane-row pane-row--input';
+  row.innerHTML = `
+    <div class="pane-row-fields">
+      <div class="pane-row-dropzone" tabindex="0" role="button" aria-label="Upload images">
+        <input type="file" accept=".jpg,.jpeg,.png,.webp,.gif" multiple hidden>
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <span>Upload</span>
+      </div>
+      <span class="pane-or">or</span>
+      <input type="url" class="pane-url-input" placeholder="https://example.com/image.jpg">
+      <button type="button" class="btn-outline pane-add-btn">Add</button>
+      <button type="button" class="pane-row-remove" aria-label="Remove row">&times;</button>
+    </div>
+    <div class="pane-row-error error-msg" hidden></div>`;
+
+  const dz        = row.querySelector('.pane-row-dropzone');
+  const fi        = row.querySelector('input[type=file]');
+  const urlIn     = row.querySelector('input[type=url]');
+  const addBtn    = row.querySelector('.pane-add-btn');
+  const removeBtn = row.querySelector('.pane-row-remove');
+  const errEl     = row.querySelector('.pane-row-error');
+
+  async function uploadFiles(files) {
+    let anyError = false;
+    for (const file of files) {
+      if (!ALLOWED_TYPES.includes(file.type)) {
+        errEl.textContent = `${file.name}: only JPG, PNG, WEBP, GIF accepted.`;
+        errEl.hidden = false; anyError = true; continue;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        errEl.textContent = `${file.name}: exceeds 10 MB limit.`;
+        errEl.hidden = false; anyError = true; continue;
+      }
+      try {
+        const fd = new FormData();
+        fd.append('image', file);
+        dz.classList.add('uploading');
+        const res = await apiFetch(`/api/entries/${editingId}/pane-images`, { method: 'POST', body: fd });
+        dz.classList.remove('uploading');
+        if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Upload failed.'); }
+        const img = await res.json();
+        row.parentNode.insertBefore(makeSavedRow(img), row);
+        errEl.hidden = true;
+      } catch (e) {
+        dz.classList.remove('uploading');
+        errEl.textContent = e.message; errEl.hidden = false; anyError = true;
+      }
+    }
+    if (!anyError) { row.remove(); syncAddBtn(); }
+  }
+
+  async function addUrl() {
+    const url = urlIn.value.trim();
+    if (!url) return;
+    if (!url.startsWith('http://') && !url.startsWith('https://')) {
+      errEl.textContent = 'URL must start with http:// or https://';
+      errEl.hidden = false; return;
+    }
+    try {
+      const res = await apiFetch(`/api/entries/${editingId}/pane-images`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url }),
+      });
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error || 'Failed to add image.'); }
+      const img = await res.json();
+      row.parentNode.insertBefore(makeSavedRow(img), row);
+      row.remove();
+      syncAddBtn();
+    } catch (e) { errEl.textContent = e.message; errEl.hidden = false; }
+  }
+
+  dz.addEventListener('click', () => fi.click());
+  dz.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fi.click(); });
+  dz.addEventListener('dragover',  (e) => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('drag-over'); uploadFiles(Array.from(e.dataTransfer.files)); });
+  fi.addEventListener('change', () => { uploadFiles(Array.from(fi.files)); fi.value = ''; });
+  addBtn.addEventListener('click', addUrl);
+  urlIn.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addUrl(); } });
+  removeBtn.addEventListener('click', () => { row.remove(); syncAddBtn(); });
+
+  return row;
+}
+
+function renderPaneRepeater(images) {
+  const repeater = $('pane-img-repeater');
+  repeater.innerHTML = '';
+  (images || []).forEach((img) => repeater.appendChild(makeSavedRow(img)));
+  syncAddBtn();
+}
+
+function syncAddBtn() {
+  const count   = $('pane-img-repeater').children.length;
+  const atLimit = count >= 6;
+  $('btn-add-pane-row').hidden        = atLimit;
+  $('pane-img-limit-msg') && ($('pane-img-limit-msg').hidden = !atLimit);
+}
+
+$('btn-add-pane-row').addEventListener('click', () => {
+  if ($('pane-img-repeater').children.length >= 6) return;
+  $('pane-img-repeater').appendChild(makeInputRow());
+  syncAddBtn();
+});
+
+// ── quill editor (panel body) ────────────────────────────────────────────────────
+let paneEditor = null;
+if (typeof Quill !== 'undefined' && document.getElementById('f-pane-body-editor')) {
+  paneEditor = new Quill('#f-pane-body-editor', {
+    theme: 'snow',
+    placeholder: 'Longer description, backstory, or blog-style content…',
+    modules: {
+      toolbar: [
+        [{ header: [2, 3, false] }],
+        ['bold', 'italic', 'underline'],
+        [{ list: 'ordered' }, { list: 'bullet' }],
+        ['link', 'blockquote'],
+        ['clean'],
+      ],
+    },
+  });
+}
+
+// ── modal tab switching ────────────────────────────────────────────────────
+document.querySelectorAll('.modal-tab').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const target = btn.dataset.tab;
+    document.querySelectorAll('.modal-tab').forEach((b) => {
+      const on = b.dataset.tab === target;
+      b.classList.toggle('active', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    document.querySelectorAll('#tab-entry, #tab-panel').forEach((p) => {
+      p.classList.toggle('active', p.id === `tab-${target}`);
+    });
+  });
+});
 // ── init ──────────────────────────────────────────────────────────────────────
 function checkAuth() {
   if (getToken()) {

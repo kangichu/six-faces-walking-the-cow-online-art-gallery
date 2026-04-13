@@ -21,7 +21,32 @@
     "align": "right",
     "image_filename": null,
     "image_url": "https://assets.codepen.io/573855/demo-monsters-02.webp",
-    "type": "main"
+    "type": "main",
+    "pane_side": "left",
+    "pane_title": "this is a test",
+    "pane_body": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p><p><br></p><p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?</p><p><br></p><p>At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.&nbsp;</p>",
+    "pane_images": [
+      {
+        "id": "2027926951db46df9c22028b4a760344",
+        "type": "upload",
+        "filename": "c3c609a6ad1f44a8bbac3b06777198ae.jpg"
+      },
+      {
+        "id": "cde8c646a5aa415985e04524dda5d40f",
+        "type": "upload",
+        "filename": "8df8f32be65f4f168258b2a3467a2d19.jpg"
+      },
+      {
+        "id": "95d95b8505234a0791aa6c7909aadedf",
+        "type": "upload",
+        "filename": "04f62912d70e4b0a8063b30f3d4d7092.jpg"
+      },
+      {
+        "id": "3c9bd9472ed44610a64122f50f9637d1",
+        "type": "upload",
+        "filename": "ca44756ed81a4b5eb2088d5fa628afef.jpg"
+      }
+    ]
   },
   {
     "id": "face000000000000000000000000003",
@@ -33,7 +58,10 @@
     "align": "left",
     "image_filename": null,
     "image_url": "https://assets.codepen.io/573855/demo-monsters-03.webp",
-    "type": "main"
+    "type": "main",
+    "pane_side": "right",
+    "pane_title": "this is test 2",
+    "pane_body": "Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?"
   },
   {
     "id": "face000000000000000000000000004",

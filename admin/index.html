@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Six Faces — Admin</title>
   <link rel="stylesheet" href="./style.css?v=__BUILD_ID__">
+  <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.7/quill.snow.css">
 </head>
 <body>
 
@@ -86,7 +87,15 @@
         <button class="modal-close" id="btn-close-modal" aria-label="Close">&times;</button>
       </div>
 
+      <nav class="modal-tabs" role="tablist">
+        <button class="modal-tab active" data-tab="entry" role="tab" aria-selected="true">Entry</button>
+        <button class="modal-tab" data-tab="panel" role="tab" aria-selected="false">Panel</button>
+      </nav>
+
       <div class="modal-body">
+
+        <!-- ── Tab: Entry ──────────────────────────────────────────────── -->
+        <div id="tab-entry" class="tab-panel active" role="tabpanel">
 
         <!-- Entry type -->
         <div class="field type-field">
@@ -167,6 +176,55 @@
             <textarea id="f-body" rows="5" placeholder="Describe this face of the cube..."></textarea>
           </div>
         </div>
+
+        </div><!-- /tab-entry -->
+
+        <!-- ── Tab: Panel ──────────────────────────────────────────────── -->
+        <div id="tab-panel" class="tab-panel" role="tabpanel">
+
+          <p class="section-hint" style="margin-block-end:0">Content shown in the slide-in panel when a visitor clicks on this face. Leave all fields blank to disable the panel.</p>
+
+          <div class="field pane-side-field">
+            <label>Slide In From</label>
+            <div class="radio-group pane-side-group">
+              <label class="radio-opt">
+                <input type="radio" name="f-pane-side" id="f-pane-left" value="left" checked>
+                <span class="radio-label">
+                  <strong>Left</strong>
+                  <small>panel enters from the left edge</small>
+                </span>
+              </label>
+              <label class="radio-opt">
+                <input type="radio" name="f-pane-side" id="f-pane-right" value="right">
+                <span class="radio-label">
+                  <strong>Right</strong>
+                  <small>panel enters from the right edge</small>
+                </span>
+              </label>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="f-pane-title">Panel Title</label>
+            <input type="text" id="f-pane-title" placeholder="A title for this panel" maxlength="100">
+          </div>
+
+          <div class="field pane-body-field">
+            <label>Panel Body</label>
+            <div id="f-pane-body-editor" class="pane-rich-editor"></div>
+          </div>
+
+          <div class="field">
+            <label>Panel Images <span class="field-hint">(max 6)</span></label>
+            <div id="pane-img-repeater" class="pane-img-repeater"></div>
+            <div id="pane-img-actions" class="pane-img-actions" hidden>
+              <button type="button" id="btn-add-pane-row" class="btn-add-pane-row">+ Add image</button>
+              <span id="pane-img-limit-msg" class="pane-img-limit-msg" hidden>Maximum of 6 images reached.</span>
+            </div>
+            <p id="pane-img-new-hint" class="section-hint pane-img-hint">Save the entry first to add panel images.</p>
+          </div>
+
+        </div><!-- /tab-panel -->
 
       </div>
 
@@ -363,6 +421,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
   <script src="./script.js?v=__BUILD_ID__"></script>
 </body>
 </html>

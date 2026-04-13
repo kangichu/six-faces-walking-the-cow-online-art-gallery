@@ -284,6 +284,10 @@ def create_entry():
         'align':          request.form.get('align', 'left').strip(),
         'image_filename': image_filename,
         'image_url':      image_url,
+        'pane_side':      request.form.get('pane_side', 'left').strip(),
+        'pane_title':     request.form.get('pane_title', '').strip(),
+        'pane_body':      request.form.get('pane_body', '').strip(),
+        'pane_images':    [],
     }
     data.append(entry)
     save_data(data)
@@ -298,7 +302,7 @@ def update_entry(entry_id):
         return jsonify({'error': 'Not found'}), 404
 
     body = request.get_json(silent=True) or {}
-    for field in ('face_name', 'tag', 'heading', 'body', 'align'):
+    for field in ('face_name', 'tag', 'heading', 'body', 'align', 'pane_side', 'pane_title', 'pane_body'):
         if field in body:
             entry[field] = str(body[field]).strip()
 
@@ -381,6 +385,61 @@ def delete_entry(entry_id):
         e['order'] = i
     save_data(data)
     return jsonify({'ok': True}), 200
+
+# ── pane images ──────────────────────────────────────────────────────────────
+@app.route('/api/entries/<entry_id>/pane-images', methods=['POST'])
+@jwt_required()
+def add_pane_image(entry_id):
+    data  = load_data()
+    entry = next((e for e in data if e['id'] == entry_id), None)
+    if not entry:
+        return jsonify({'error': 'Not found'}), 404
+
+    if 'pane_images' not in entry or not isinstance(entry['pane_images'], list):
+        entry['pane_images'] = []
+
+    img_entry = {'id': uuid.uuid4().hex}
+
+    # Try multipart file upload first
+    file = request.files.get('image')
+    if file and file.filename and allowed_file(file.filename):
+        img_entry['type']     = 'upload'
+        img_entry['filename'] = save_upload(file)
+    else:
+        # Fall back to JSON body with a URL
+        body    = request.get_json(silent=True) or {}
+        raw_url = str(body.get('url', '')).strip()
+        if raw_url and raw_url.startswith(('http://', 'https://')):
+            img_entry['type'] = 'url'
+            img_entry['src']  = raw_url
+        else:
+            return jsonify({'error': 'Provide a valid image file or an http/https URL'}), 400
+
+    entry['pane_images'].append(img_entry)
+    save_data(data)
+    return jsonify(img_entry), 201
+
+
+@app.route('/api/entries/<entry_id>/pane-images/<img_id>', methods=['DELETE'])
+@jwt_required()
+def delete_pane_image(entry_id, img_id):
+    data  = load_data()
+    entry = next((e for e in data if e['id'] == entry_id), None)
+    if not entry:
+        return jsonify({'error': 'Not found'}), 404
+
+    images = entry.get('pane_images', [])
+    img    = next((i for i in images if i['id'] == img_id), None)
+    if not img:
+        return jsonify({'error': 'Pane image not found'}), 404
+
+    if img.get('type') == 'upload':
+        safe_delete_image(img.get('filename'))
+
+    entry['pane_images'] = [i for i in images if i['id'] != img_id]
+    save_data(data)
+    return jsonify({'ok': True}), 200
+
 
 # ── site settings ────────────────────────────────────────────────────────────
 @app.route('/api/settings', methods=['GET'])

@@ -3,8 +3,7 @@ const SWAP_RADIUS = 3;
 
 // ── mutable state (populated by init()) ──────────────────────────────────────
 let IMAGE_SRCS   = [];
-let FACE_NAMES   = [];
-let N            = 0;
+let FACE_NAMES   = [];let PANE_DATA    = [];let N            = 0;
 let STOPS        = [];
 let sections     = [];
 let sceneDots    = [];
@@ -152,6 +151,9 @@ function buildSectionsDOM(entries) {
     const headingHtml = (entry.heading || '')
       .split('\n').map((l) => l.trim()).filter(Boolean).join('<br>');
 
+    const hasPaneContent = !!(entry.pane_title || entry.pane_body ||
+      (entry.pane_images && entry.pane_images.length));
+
     const sec = document.createElement('section');
     sec.id = `s${i}`;
     sec.innerHTML = `
@@ -160,6 +162,7 @@ function buildSectionsDOM(entries) {
         <div class="tag">${escHtml(entry.tag || '')}</div>
         <h2>${headingHtml}</h2>
         <p class="body-text">${escHtml(entry.body || '')}</p>
+        ${hasPaneContent ? `<button class="read-more-btn" data-pane-idx="${i}">Read more</button>` : ''}
         <div class="cta-row"${ctaAlignStyle}>
           <a class="cta-back" href="#s${i - 1}">
             <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5">
@@ -230,6 +233,7 @@ const updateHUD = (s) => {
     dom.captionNum.textContent  = String(si + 1).padStart(2, '0');
     dom.captionName.textContent = name;
     sceneDots.forEach((d, i) => d.classList.toggle('active', i === si));
+    if (typeof updatePaneTab === 'function') updatePaneTab(si);
   }
 };
 
@@ -413,6 +417,12 @@ async function init() {
       : (e.image_url || null)
   );
   FACE_NAMES = entries.map((e) => (e.face_name || '').toUpperCase());
+  PANE_DATA  = entries.map((e) => ({
+    pane_side:   e.pane_side   || 'left',
+    pane_title:  e.pane_title  || '',
+    pane_body:   e.pane_body   || '',
+    pane_images: e.pane_images || [],
+  }));
   STOPS      = buildStops(N);
 
   // 2. Build gallery sections + nav dots
@@ -466,11 +476,13 @@ async function init() {
   ro.observe(document.documentElement);
 
   window.addEventListener('scroll', () => {
+    if (document.documentElement.classList.contains('pane-open')) return;
     tgt = maxScroll > 0 ? scrollY / maxScroll : 0;
     tgt = Math.max(0, Math.min(1, tgt));
   }, { passive: true });
 
   window.addEventListener('wheel', (e) => {
+    if (document.documentElement.classList.contains('pane-open')) return;
     e.preventDefault();
     const linePx = 16;
     const pagePx = innerHeight * 0.9;
@@ -519,10 +531,166 @@ async function init() {
   const open  = () => { overlay.hidden = false; };
   const close = () => { overlay.hidden = true;  };
 
-  btnOpen.addEventListener('click',  open);
+  btnOpen.addEventListener('click', () => { open(); });
   btnClose.addEventListener('click', close);
   overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !overlay.hidden) close(); });
+})();
+
+// ── face pane ─────────────────────────────────────────────────────────────────
+(function () {
+  const pane        = document.getElementById('face-pane');
+  const backdrop    = document.getElementById('pane-backdrop');
+  const closeBtn    = document.getElementById('face-pane-close');
+  const labelEl     = document.getElementById('face-pane-label');
+  const titleEl     = document.getElementById('face-pane-title');
+  const imagesEl    = document.getElementById('face-pane-images');
+  const bodyEl      = document.getElementById('face-pane-body');
+
+  let activeIdx = -1;
+
+  // Called by updateHUD whenever the visible face changes.
+  window.updatePaneTab = function (faceIdx) {
+    const data = PANE_DATA[faceIdx];
+    const hasContent = data && (data.pane_title || data.pane_body ||
+      (data.pane_images && data.pane_images.length > 0));
+
+    if (!hasContent) {
+      if (pane.classList.contains('open')) closePane();
+      return;
+    }
+
+    activeIdx = faceIdx;
+  };
+
+  // Mirrors CSS clamp(18rem, 32vw, 26rem) converted to px
+  function paneW() {
+    return Math.min(Math.max(17 * 16, 0.37 * window.innerWidth), 31 * 16) + 'px';
+  }
+
+  function openPane(entryIdx) {
+    const data = PANE_DATA[entryIdx];
+    if (!data) return;
+
+    // Snap to the correct off-screen starting position without animating.
+    // If we let the transition run, changing data-side while closed causes the
+    // pane to visibly slide across to its new resting position before opening.
+    const newSide = data.pane_side || 'left';
+    if (pane.dataset.side !== newSide || !pane.classList.contains('open')) {
+      pane.style.transition = 'none';
+      pane.dataset.side = newSide;
+      pane.getBoundingClientRect(); // force reflow so the snap takes effect
+      pane.style.transition = '';
+    }
+
+    if (labelEl)  labelEl.textContent = FACE_NAMES[entryIdx] || '';
+    if (titleEl)  titleEl.textContent = data.pane_title || '';
+
+    if (imagesEl) {
+      imagesEl.innerHTML = '';
+      const srcs = (data.pane_images || []).map((img) =>
+        img.type === 'upload' ? `/uploads/${img.filename}` : (img.src || '')
+      ).filter(Boolean);
+
+      if (srcs.length) {
+        let imgIdx = 0;
+
+        const track = document.createElement('div');
+        track.className = 'pane-img-track';
+        srcs.forEach((src) => {
+          const el = new Image();
+          el.src     = src;
+          el.alt     = data.pane_title || '';
+          el.loading = 'lazy';
+          track.appendChild(el);
+        });
+        imagesEl.appendChild(track);
+
+        if (srcs.length > 1) {
+          const nav = document.createElement('div');
+          nav.className = 'pane-img-nav';
+
+          const dots = document.createElement('div');
+          dots.className = 'pane-img-dots';
+          srcs.forEach((_, i) => {
+            const d = document.createElement('span');
+            d.className = 'pane-img-dot';
+            dots.appendChild(d);
+          });
+          const dotEls = [...dots.children];
+
+          const arrows = document.createElement('div');
+          arrows.className = 'pane-img-arrows';
+
+          const btnPrev = document.createElement('button');
+          btnPrev.className = 'pane-img-arrow';
+          btnPrev.innerHTML = '&#8592;';
+          btnPrev.setAttribute('aria-label', 'Previous image');
+
+          const btnNext = document.createElement('button');
+          btnNext.className = 'pane-img-arrow';
+          btnNext.innerHTML = '&#8594;';
+          btnNext.setAttribute('aria-label', 'Next image');
+
+          const goTo = (n) => {
+            imgIdx = Math.max(0, Math.min(srcs.length - 1, n));
+            track.style.transform = `translateX(-${imgIdx * 100}%)`;
+            dotEls.forEach((d, i) => d.classList.toggle('active', i === imgIdx));
+            btnPrev.disabled      = imgIdx === 0;
+            btnNext.disabled      = imgIdx === srcs.length - 1;
+          };
+
+          btnPrev.addEventListener('click', () => goTo(imgIdx - 1));
+          btnNext.addEventListener('click', () => goTo(imgIdx + 1));
+
+          arrows.appendChild(btnPrev);
+          arrows.appendChild(btnNext);
+          nav.appendChild(dots);
+          nav.appendChild(arrows);
+          imagesEl.appendChild(nav);
+
+          goTo(0);
+        }
+      }
+    }
+
+    if (bodyEl) {
+      const text = data.pane_body || '';
+      // Support both HTML (Quill output) and legacy plain text (double-newline paragraphs)
+      if (text.trim().startsWith('<')) {
+        bodyEl.innerHTML = text;
+      } else {
+        bodyEl.innerHTML = text
+          .split(/\n\n+/)
+          .map((p) => `<p>${escHtml(p.trim())}</p>`)
+          .join('');
+      }
+    }
+
+    pane.classList.add('open');
+    backdrop.classList.add('visible');
+    document.documentElement.classList.add('pane-open');
+    closeBtn.focus();
+  }
+
+  function closePane() {
+    pane.classList.remove('open');
+    backdrop.classList.remove('visible');
+    document.documentElement.classList.remove('pane-open');
+  }
+
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.read-more-btn');
+    if (!btn) return;
+    const idx = parseInt(btn.dataset.paneIdx, 10);
+    if (!isNaN(idx)) openPane(idx);
+  });
+
+  closeBtn.addEventListener('click', closePane);
+  backdrop.addEventListener('click', closePane);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && pane.classList.contains('open')) closePane();
+  });
 })();
 
 init();
